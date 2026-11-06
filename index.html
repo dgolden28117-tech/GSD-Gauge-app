@@ -466,9 +466,9 @@ function startupGauge(ctx,i,elapsed,v,time){
    ctx.save();circle();ctx.clip();ctx.globalAlpha=opacity;
    if(headerStartupLogo.complete && headerStartupLogo.naturalWidth){
     const size=242;
-    ctx.drawImage(headerStartupLogo,C-size/2,C-size/2,size,size);
+    ctx.drawImage(headerStartupLogo,C-size/2,C-size/4,size,size/2);
    }else{
-    paintGSD(ctx,C,C,3.1);
+    ctx.save();ctx.translate(C,C);ctx.scale(1,0.5);paintGSD(ctx,0,0,3.1);ctx.restore();
    }
    ctx.restore();
   }
