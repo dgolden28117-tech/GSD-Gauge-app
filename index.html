@@ -445,6 +445,8 @@ function startupGauge(ctx,i,elapsed,v,time){
    const words='GOLDEN SPEED DYNAMICS';
    ctx.font="400 150px 'GSD Sutro',sans-serif";
    ctx.textAlign='left';ctx.textBaseline='middle';
+   // Compress only the scrolling startup lettering vertically, keeping its width.
+   ctx.translate(0,150);ctx.scale(1,0.5);ctx.translate(0,-150);
    const w=ctx.measureText(words).width;
    // Travel continuously from fully outside the right gauge to fully outside the left.
    const x=900-(900+w)*(t/scrollEnd);
@@ -466,9 +468,9 @@ function startupGauge(ctx,i,elapsed,v,time){
    ctx.save();circle();ctx.clip();ctx.globalAlpha=opacity;
    if(headerStartupLogo.complete && headerStartupLogo.naturalWidth){
     const size=242;
-    ctx.drawImage(headerStartupLogo,C-size/2,C-size/4,size,size/2);
+    ctx.drawImage(headerStartupLogo,C-size/2,C-size/2,size,size);
    }else{
-    ctx.save();ctx.translate(C,C);ctx.scale(1,0.5);paintGSD(ctx,0,0,3.1);ctx.restore();
+    paintGSD(ctx,C,C,3.1);
    }
    ctx.restore();
   }
