@@ -184,13 +184,29 @@ if(state.splitEnabled&&state.splitEnabled[i]){
  const top=-Math.PI/2;
  function half(label,sign){
   const d=readout(label,v,time),fraction=clamp(d.pct,0,1);
-  // Left: 6 to 12 clockwise around the left half. Right: 12 to 6 clockwise.
+  // Left: 6 to 12 clockwise. Right: 12 to 6 clockwise.
   const origin=sign<0?Math.PI/2:top;
   stroke(119,origin,origin+Math.PI,'#34263e',7);
-  const warningFraction=label==='Intake Air Temperature'?clamp((+state.iatWarn-d.min)/(d.max-d.min),0,1):label==='Exhaust Gas Temperature'?clamp((+state.egtWarn-d.min)/(d.max-d.min),0,1):1;
-  const normalFraction=Math.min(fraction,warningFraction);
-  if(normalFraction>0)stroke(119,top,origin+Math.PI*normalFraction,base,7,true);
-  if(fraction>warningFraction)stroke(119,origin+Math.PI*warningFraction,origin+Math.PI*fraction,'#ff4055',7,true);
+  if(label==='Air/Fuel Ratio'){
+   // Match single AFR behavior: a traveling bright center with fading tails,
+   // not a progress-fill sweep. Scale 11–17 AFR across this half-ring.
+   const p=clamp(v.afr,11,17),low=+state.afrLow,high=+state.afrHigh;
+   const col=p<low||p>high?'#ff354d':(p<low+.4||p>high-.4?'#ffbe39':base);
+   const center=origin+(p-11)/6*Math.PI;
+   for(let j=-42;j<=42;j++){
+    const distance=Math.abs(j)/42,alpha=Math.pow(1-distance,2.1)*.96;
+    const a=center+j*rad*.65,b=center+(j+1)*rad*.65;
+    // Keep the moving highlight within its assigned semicircle.
+    if(a<origin||b>origin+Math.PI)continue;
+    ctx.save();ctx.globalAlpha*=alpha;
+    stroke(119,a,b,col,7,distance<.3);ctx.restore();
+   }
+  }else{
+   const warningFraction=label==='Intake Air Temperature'?clamp((+state.iatWarn-d.min)/(d.max-d.min),0,1):label==='Exhaust Gas Temperature'?clamp((+state.egtWarn-d.min)/(d.max-d.min),0,1):1;
+   const normalFraction=Math.min(fraction,warningFraction);
+   if(normalFraction>0)stroke(119,origin,origin+Math.PI*normalFraction,base,7,true);
+   if(fraction>warningFraction)stroke(119,origin+Math.PI*warningFraction,origin+Math.PI*fraction,'#ff4055',7,true);
+  }
   for(let n=0;n<=10;n++){let a=origin+n/10*Math.PI;tick(a,n%2===0);if(n%2===0&&n!==10)mark(Math.round(d.min+(d.max-d.min)*n/10),91,a,10)}
   const x=sign<0?104:196;
   const shortName=label==='Intake Air Temperature'?'IAT':label==='Exhaust Gas Temperature'?'EGT':label==='Air/Fuel Ratio'?'AFR':label==='Boost Pressure'?'BOOST':label==='Coolant Temperature'?'COOLANT':label==='Oil Temperature'?'OIL TEMP':label==='Oil Pressure'?'OIL PSI':label==='Transmission Temperature'?'TRANS TEMP':label==='Battery Voltage'?'VOLTAGE':label==='Vehicle Speed'?'SPEED':label==='Engine RPM'?'RPM':label==='Ambient Air Temperature'?'AMBIENT':label==='Fuel Rail Pressure'?'FUEL PSI':label==='Fuel Economy'?'MPG':label==='Fuel Level'?'FUEL':label==='Engine Load'?'LOAD':label;
