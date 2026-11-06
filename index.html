@@ -340,12 +340,13 @@ function startupGauge(ctx,i,elapsed,v,time){
   const ascent=metrics.actualBoundingBoxAscent||86,descent=metrics.actualBoundingBoxDescent||4;
   const x=150-(right-left)/2+left;
   const y=150+(ascent-descent)/2;
-  // Fill, colored outer outline, and glow all follow the shared background color.
-  const bootColor=(state.backgrounds&&state.backgrounds[0])||'#a020f0';
-  ctx.fillStyle=bootColor;ctx.shadowColor=bootColor;ctx.shadowBlur=38;
+  // Startup GSD letters use fixed white, independent of all user color settings.
+  const bootColor='#ffffff';
+  const bootGlow='#700000'; // fixed dark-red startup glow, independent of user colors
+  ctx.fillStyle=bootColor;ctx.shadowColor=bootGlow;ctx.shadowBlur=38;
   ctx.globalAlpha=alpha*.52;ctx.fillText(ch,x,y);
   ctx.shadowBlur=20;ctx.globalAlpha=alpha*.8;ctx.fillText(ch,x,y);
-  // Layered keylines: matching-color outer edge, black separator, colored glyph.
+  // Layered keylines: white outer edge, black separator, white glyph.
   ctx.globalAlpha=alpha;ctx.shadowBlur=0;ctx.shadowColor='transparent';
   ctx.lineJoin='round';ctx.miterLimit=2;
   ctx.strokeStyle=bootColor;ctx.lineWidth=14;ctx.strokeText(ch,x,y);
