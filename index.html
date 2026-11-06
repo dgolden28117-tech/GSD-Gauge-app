@@ -202,12 +202,25 @@ if(faceStyle==='honeycomb'||faceStyle==='hexglow'){
   ctx.beginPath();ctx.moveTo(x-W/4,y-H/2);ctx.lineTo(x+W/4,y-H/2);
   ctx.lineTo(x+W/2,y);ctx.lineTo(x+W/4,y+H/2);
   ctx.lineTo(x-W/4,y+H/2);ctx.lineTo(x-W/2,y);ctx.closePath();
-  // Heavy recessed shadow beneath each ORIGINAL hex outline; never replace its glow.
+  // The GLOW is already painted below this honeycomb. Raise the hex lattice
+  // above it using a dark extrusion, while keeping the complete six-sided shape.
   ctx.save();
-  ctx.shadowColor='rgba(0,0,0,.98)';ctx.shadowBlur=8;
-  ctx.shadowOffsetX=2.4;ctx.shadowOffsetY=3.6;
-  ctx.strokeStyle='rgba(0,0,0,.82)';ctx.lineWidth=2.5;ctx.stroke();
+  ctx.translate(1.7,3.2);
+  ctx.strokeStyle='rgba(0,0,0,.96)';
+  ctx.lineWidth=3.8;
+  ctx.shadowColor='rgba(0,0,0,.85)';
+  ctx.shadowBlur=4;
+  ctx.stroke();
   ctx.restore();
+  // Subtle light on the upper rim reinforces the raised profile.
+  ctx.save();
+  ctx.translate(-.45,-.65);
+  ctx.strokeStyle=`rgba(${rr},${gg},${bb},.34)`;
+  ctx.lineWidth=2.0;
+  ctx.shadowBlur=0;
+  ctx.stroke();
+  ctx.restore();
+  // Original illuminated six-sided outline remains fully visible above the glow.
   ctx.strokeStyle=`rgba(${rr},${gg},${bb},${(faceStyle==='hexglow' ? (.23+intensity*.52) : (.16+intensity*.46)).toFixed(3)})`;
   ctx.lineWidth=.85;ctx.shadowColor=hexColor;ctx.shadowBlur=3.6;ctx.stroke();
  }
