@@ -202,14 +202,29 @@ if(faceStyle==='honeycomb'||faceStyle==='hexglow'){
   ctx.beginPath();ctx.moveTo(x-W/4,y-H/2);ctx.lineTo(x+W/4,y-H/2);
   ctx.lineTo(x+W/2,y);ctx.lineTo(x+W/4,y+H/2);
   ctx.lineTo(x-W/4,y+H/2);ctx.lineTo(x-W/2,y);ctx.closePath();
-  // Subtle recessed bevel: dark lower-right edge, illuminated upper-left lip.
-  // Keep the original flat-wide hex geometry and existing glow/color behavior.
-  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=1.7;
-  ctx.strokeStyle='rgba(0,0,0,.78)';ctx.translate(.85,1.15);ctx.stroke();ctx.restore();
-  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=.75;
-  ctx.strokeStyle=`rgba(${rr},${gg},${bb},.29)`;ctx.translate(-.65,-.85);ctx.stroke();ctx.restore();
-  ctx.strokeStyle=`rgba(${rr},${gg},${bb},${(faceStyle==='hexglow' ? (.23+intensity*.52) : (.16+intensity*.46)).toFixed(3)})`;
-  ctx.lineWidth=.85;ctx.shadowColor=hexColor;ctx.shadowBlur=3.6;ctx.stroke();
+  // Deep embossed honeycomb: offset shadow, dark inset floor, raised rim and colored light spill.
+  ctx.save();ctx.shadowBlur=0;ctx.translate(1.65,2.25);
+  ctx.lineWidth=3.4;ctx.strokeStyle='rgba(0,0,0,.96)';ctx.stroke();ctx.restore();
+  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=2.7;
+  ctx.strokeStyle=`rgba(${rr},${gg},${bb},${faceStyle==='hexglow'?'.19':'.11'})`;
+  ctx.translate(-1.15,-1.35);ctx.stroke();ctx.restore();
+  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=1.65;
+  ctx.strokeStyle='rgba(3,2,8,.96)';ctx.translate(.55,.85);ctx.stroke();ctx.restore();
+  // Light-catching rim with directional specular highlight.
+  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=1.15;
+  ctx.strokeStyle=`rgba(${rr},${gg},${bb},${faceStyle==='hexglow'?'.72':'.48'})`;
+  ctx.translate(-.75,-1.05);ctx.stroke();ctx.restore();
+  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=.6;
+  ctx.strokeStyle='rgba(215,195,235,.24)';ctx.translate(-1.05,-1.4);ctx.stroke();ctx.restore();
+  ctx.strokeStyle=`rgba(${rr},${gg},${bb},${faceStyle==='hexglow'?'.78':'.53'})`;
+  ctx.lineWidth=.9;ctx.shadowColor=hexColor;
+  ctx.shadowBlur=faceStyle==='hexglow'?8:3.8;ctx.stroke();
+  // Interior glows near the bottom of the gauge without washing out the recessed cells.
+  if(faceStyle==='hexglow'){
+   const light= Math.max(0,Math.min(1,(y-90)/190));
+   ctx.save();ctx.shadowBlur=0;ctx.globalAlpha*=light*.15;
+   ctx.fillStyle=`rgb(${rr},${gg},${bb})`;ctx.fill();ctx.restore();
+  }
  }
  ctx.restore();
  const shade=ctx.createRadialGradient(C,C,10,C,C,130);
