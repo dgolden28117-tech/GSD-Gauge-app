@@ -202,29 +202,56 @@ if(faceStyle==='honeycomb'||faceStyle==='hexglow'){
   ctx.beginPath();ctx.moveTo(x-W/4,y-H/2);ctx.lineTo(x+W/4,y-H/2);
   ctx.lineTo(x+W/2,y);ctx.lineTo(x+W/4,y+H/2);
   ctx.lineTo(x-W/4,y+H/2);ctx.lineTo(x-W/2,y);ctx.closePath();
-  // Deep embossed honeycomb: offset shadow, dark inset floor, raised rim and colored light spill.
-  ctx.save();ctx.shadowBlur=0;ctx.translate(1.65,2.25);
-  ctx.lineWidth=3.4;ctx.strokeStyle='rgba(0,0,0,.96)';ctx.stroke();ctx.restore();
-  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=2.7;
-  ctx.strokeStyle=`rgba(${rr},${gg},${bb},${faceStyle==='hexglow'?'.19':'.11'})`;
-  ctx.translate(-1.15,-1.35);ctx.stroke();ctx.restore();
-  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=1.65;
-  ctx.strokeStyle='rgba(3,2,8,.96)';ctx.translate(.55,.85);ctx.stroke();ctx.restore();
-  // Light-catching rim with directional specular highlight.
-  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=1.15;
-  ctx.strokeStyle=`rgba(${rr},${gg},${bb},${faceStyle==='hexglow'?'.72':'.48'})`;
-  ctx.translate(-.75,-1.05);ctx.stroke();ctx.restore();
-  ctx.save();ctx.shadowBlur=0;ctx.lineWidth=.6;
-  ctx.strokeStyle='rgba(215,195,235,.24)';ctx.translate(-1.05,-1.4);ctx.stroke();ctx.restore();
-  ctx.strokeStyle=`rgba(${rr},${gg},${bb},${faceStyle==='hexglow'?'.78':'.53'})`;
-  ctx.lineWidth=.9;ctx.shadowColor=hexColor;
-  ctx.shadowBlur=faceStyle==='hexglow'?8:3.8;ctx.stroke();
-  // Interior glows near the bottom of the gauge without washing out the recessed cells.
-  if(faceStyle==='hexglow'){
-   const light= Math.max(0,Math.min(1,(y-90)/190));
-   ctx.save();ctx.shadowBlur=0;ctx.globalAlpha*=light*.15;
-   ctx.fillStyle=`rgb(${rr},${gg},${bb})`;ctx.fill();ctx.restore();
+  // Recessed machined cell: distinct sidewalls, a sunken floor and directional light.
+  // The geometry and pitch above are deliberately unchanged.
+  const hot=faceStyle==='hexglow';
+  const light=Math.max(0,Math.min(1,(y-65)/215));
+  const depth=3.1;
+  ctx.save();ctx.shadowBlur=0;
+  // Outer rim is the uncut face of the material.
+  ctx.lineWidth=3.2;ctx.strokeStyle='rgba(3,2,9,.98)';ctx.stroke();
+  // A second polygon is displaced downward, giving the pocket a visible bottom.
+  ctx.save();ctx.translate(0,depth);
+  ctx.fillStyle='rgba(0,0,0,.92)';ctx.fill();
+  ctx.lineWidth=1.7;ctx.strokeStyle='rgba(0,0,0,.98)';ctx.stroke();
+  ctx.restore();
+  // Upper and left inside walls catch colored illumination.
+  ctx.beginPath();ctx.moveTo(x-W/4,y-H/2);ctx.lineTo(x-W/4,y-H/2+depth);
+  ctx.lineTo(x-W/2,y+depth);ctx.lineTo(x-W/2,y);ctx.closePath();
+  ctx.fillStyle=`rgba(${rr},${gg},${bb},${hot?.52:.30})`;ctx.fill();
+  ctx.beginPath();ctx.moveTo(x-W/4,y-H/2);ctx.lineTo(x+W/4,y-H/2);
+  ctx.lineTo(x+W/4,y-H/2+depth);ctx.lineTo(x-W/4,y-H/2+depth);ctx.closePath();
+  ctx.fillStyle=`rgba(${rr},${gg},${bb},${hot?.64:.34})`;ctx.fill();
+  // Opposing walls fall into nearly black shadow.
+  ctx.beginPath();ctx.moveTo(x+W/4,y-H/2);ctx.lineTo(x+W/2,y);
+  ctx.lineTo(x+W/2,y+depth);ctx.lineTo(x+W/4,y-H/2+depth);ctx.closePath();
+  ctx.fillStyle='rgba(2,1,6,.97)';ctx.fill();
+  ctx.beginPath();ctx.moveTo(x-W/2,y);ctx.lineTo(x-W/4,y+H/2);
+  ctx.lineTo(x+W/4,y+H/2);ctx.lineTo(x+W/2,y);
+  ctx.lineTo(x+W/2,y+depth);ctx.lineTo(x+W/4,y+H/2+depth);
+  ctx.lineTo(x-W/4,y+H/2+depth);ctx.lineTo(x-W/2,y+depth);ctx.closePath();
+  ctx.fillStyle='rgba(1,1,4,.88)';ctx.fill();
+  // Recessed floor is lit only by reflected light; it stays darker than the rim.
+  ctx.save();ctx.translate(0,depth);
+  const floor=ctx.createLinearGradient(x-12,y-10,x+10,y+11);
+  floor.addColorStop(0,`rgba(${rr},${gg},${bb},${hot?.16:.07})`);
+  floor.addColorStop(.46,'rgba(4,2,10,.94)');
+  floor.addColorStop(1,`rgba(${rr},${gg},${bb},${hot?.08:.03})`);
+  ctx.fillStyle=floor;ctx.fill();ctx.restore();
+  // Thin sharp highlight and separate outer halo: avoid filling the cells with glow.
+  ctx.beginPath();ctx.moveTo(x-W/2,y);ctx.lineTo(x-W/4,y-H/2);
+  ctx.lineTo(x+W/4,y-H/2);ctx.lineTo(x+W/2,y);
+  ctx.strokeStyle=`rgba(${rr},${gg},${bb},${hot?.88:.57})`;
+  ctx.lineWidth=1.25;ctx.shadowColor=hexColor;ctx.shadowBlur=hot?5:2;ctx.stroke();
+  ctx.shadowBlur=0;
+  ctx.beginPath();ctx.moveTo(x-W/4,y+H/2);ctx.lineTo(x+W/4,y+H/2);
+  ctx.lineTo(x+W/2,y);
+  ctx.strokeStyle='rgba(0,0,0,.98)';ctx.lineWidth=2;ctx.stroke();
+  if(hot&&light>0){
+    ctx.save();ctx.translate(0,depth);ctx.globalAlpha*=light*.12;
+    ctx.fillStyle=`rgb(${rr},${gg},${bb})`;ctx.fill();ctx.restore();
   }
+  ctx.restore();
  }
  ctx.restore();
  const shade=ctx.createRadialGradient(C,C,10,C,C,130);
